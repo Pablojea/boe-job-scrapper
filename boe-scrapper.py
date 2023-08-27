@@ -1,11 +1,10 @@
 import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from datetime import date
-from datetime import timedelta
 import time
 
 
+# scrappes offers fors the provided day(YYYY/MM/DD)
 def scrap_day(day) -> None:
     driver.get('https://www.boe.es/boe/dias/' + day + '/index.php?s=2B')
     time.sleep(2)
@@ -19,8 +18,8 @@ def scrap_day(day) -> None:
 
 
 # parameters
-singleDayMode = False
-timespan = 20
+singleDayMode = False # True: scrappes yesterday offers / False: scrappes 'timespan' of days backwards from yesterday
+timespan = 15
 area = '(Pontevedra)'
 
 # browser configuration
@@ -28,20 +27,21 @@ chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
 driver = webdriver.Chrome(options=chrome_options)
 driver.set_window_size(1200, 900)
-driver.implicitly_wait(2)
+driver.implicitly_wait(2) # Increase wait time for slower internet conections
 
 # scrapping
-searchDate = (date.today() - datetime.timedelta(days=1)).strftime('%Y/%m/%d')
+searchDate = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y/%m/%d')
 url_template = 'https://www.boe.es/boe/dias/' + searchDate + '/index.php?s=2B'
-
 offerList = []
 
 if singleDayMode:
     scrap_day(searchDate)
 else:
     for i in range(1, timespan + 1):
-        searchDate = (date.today() - datetime.timedelta(days=i)).strftime('%Y/%m/%d')
-        scrap_day(searchDate)
+        searchDate = (datetime.date.today() - datetime.timedelta(days=i)).strftime('%Y/%m/%d')
+        weekday = datetime.datetime.strptime(searchDate, '%Y/%m/%d').weekday()
+        if weekday != 6:
+            scrap_day(searchDate)
 
 for row in offerList:
     print(row[0] + '  -> ' + row[1])
