@@ -4,30 +4,31 @@ from selenium.webdriver.common.by import By
 import time
 
 
-# scrappes offers fors the provided day(YYYY/MM/DD)
+# scrappes offers for the provided day(YYYY/MM/DD)
 def scrap_day(day) -> None:
     driver.get('https://www.boe.es/boe/dias/' + day + '/index.php?s=2B')
     time.sleep(2)
     offers = driver.find_elements(by=By.CLASS_NAME, value="dispo")
 
     for offer in offers:
-        if area + ', referente a la convocatoria para proveer' in offer.text:
-            offer_text = offer.find_element(by=By.TAG_NAME, value="p").text
-            offer_link = offer.find_element(by=By.TAG_NAME, value="a").get_attribute(name="href")
-            offer_list.append((offer_text, offer_link))
+        for area in areas:
+            if (area in offer.text) and ('referente a la convocatoria para proveer' in offer.text):
+                offer_text = offer.find_element(by=By.TAG_NAME, value="p").text
+                offer_link = offer.find_element(by=By.TAG_NAME, value="a").get_attribute(name="href")
+                offer_list.append((offer_text, offer_link))
 
 
 # parameters
-single_day_mode = False # True: scrappes yesterday offers / False: scrappes 'timespan' of days backwards from yesterday
+single_day_mode = True  # True: scrappes yesterday offers / False: scrappes 'timespan' of days backwards from yesterday
 timespan = 5
-area = '(Pontevedra)'
+areas = ['Pontevedra', 'A Coruña', 'Lugo', 'Ourense']
 
 # browser configuration
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument("--incognito")
 driver = webdriver.Chrome(options=chrome_options)
 driver.set_window_size(1200, 900)
-driver.implicitly_wait(2) # Increase wait time for slower internet conections
+driver.implicitly_wait(2)  # Increase wait time for slower internet connections
 
 # scrapping
 searchDate = (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y/%m/%d')

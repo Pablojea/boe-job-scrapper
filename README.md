@@ -6,4 +6,4 @@ If single_day_mode is set to False, will parse the number of days provided in ti
 
 time_span : Is the number of days to collect data from
 
-area : Is the name of the province to search offers in. Must be provided in the format '(province_name')
+areas : List with the names of the provinces to search offers in. Must be provided in the format
